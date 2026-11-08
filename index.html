@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tạo động lực & Phong cách lãnh đạo - Case study Highlands Coffee</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#110c08; --cream:#fcfaf7; --mute:#a8a29e; --red:#b91c1c; --gold:#eab308; }
+  html, body { margin:0; height:100%; overflow:hidden; background:var(--bg); color:var(--cream);
+               font-family:'Lexend', system-ui, sans-serif; }
+  .grain { background-image:radial-gradient(rgba(234,179,8,.05) 1px, transparent 1px); background-size:26px 26px; }
+  .orb { position:fixed; left:0; top:0; width:46vmin; height:46vmin; border-radius:9999px;
+         filter:blur(100px); opacity:.4; pointer-events:none; z-index:0; }
+  .slide { position:absolute; inset:0; width:100%; height:100vh; height:100dvh; display:flex; align-items:center;
+           justify-content:center; padding:3.2rem 1.5rem 4.6rem; overflow-y:auto; scrollbar-width:none;
+           visibility:hidden; opacity:0; pointer-events:none; }
+  .slide::-webkit-scrollbar { display:none; }
+  .slide.active { pointer-events:auto; }
+  .inner { width:100%; max-width:74rem; margin:auto; will-change:transform, opacity; }
+  .card { background:rgba(255,255,255,.045); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+          border:1px solid rgba(255,255,255,.09); border-radius:1rem; padding:1.4rem;
+          box-shadow:0 25px 50px -12px rgba(0,0,0,.7); transition:border-color .3s, background .3s; }
+  .card:hover { border-color:rgba(185,28,28,.75); background:rgba(255,255,255,.07); }
+  .grad { background:linear-gradient(90deg,#dc2626,#eab308); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .tag { font-size:.72rem; letter-spacing:.24em; text-transform:uppercase; color:var(--gold); font-weight:600; }
+  .ic { width:1.4rem; height:1.4rem; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
+  .ic.lg { width:2.2rem; height:2.2rem; }
+  .li { display:flex; gap:.6rem; align-items:flex-start; color:#d6d3d1; font-size:.9rem; line-height:1.5; }
+  .li svg { margin-top:.2rem; width:1rem; height:1rem; color:var(--gold); }
+  .pill { display:inline-block; padding:.2rem .7rem; border-radius:9999px; font-size:.72rem; font-weight:600; }
+  .dot { width:8px; height:8px; border-radius:9999px; background:rgba(168,162,158,.35); transition:all .35s; cursor:pointer; }
+  .dot.on { width:28px; background:var(--red); box-shadow:0 0 10px var(--red); }
+  .btn { height:2.5rem; padding:0 1.1rem; border-radius:9999px; font-size:.85rem; transition:all .25s; }
+  .btn:disabled { opacity:.3; cursor:not-allowed; }
+</style>
+</head>
+<body class="grain">
+
+<!-- Biểu tượng SVG -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-coffee" viewBox="0 0 24 24"><path d="M17 8h1a4 4 0 1 1 0 8h-1M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4zM6 2v2M10 2v2M14 2v2"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20V2H6.5A2.5 2.5 0 0 0 4 4.5z"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></symbol>
+  <symbol id="i-msg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></symbol>
+  <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2V18h6v-1.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2z"/></symbol>
+  <symbol id="i-award" viewBox="0 0 24 24"><circle cx="12" cy="8" r="7"/><path d="M8.21 13.89 7 23l5-3 5 3-1.21-9.12"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></symbol>
+  <symbol id="i-trend" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></symbol>
+</svg>
+
+<!-- Hai khối cầu sáng nền -->
+<div class="orb" id="o1" style="background:#b91c1c"></div>
+<div class="orb" id="o2" style="background:#eab308"></div>
+
+<!-- Thanh tiến trình -->
+<div class="fixed bottom-0 left-0 w-full h-[3px] bg-white/10 z-50">
+  <div id="progress" class="h-full" style="width:0;background:linear-gradient(90deg,#b91c1c,#eab308);box-shadow:0 0 12px #b91c1c"></div>
+</div>
+
+<main class="relative w-full h-screen">
+
+  <!-- ===== SLIDE 1: TRANG TIÊU ĐỀ ===== -->
+  <section class="slide">
+    <div class="inner grid lg:grid-cols-5 gap-10 items-center">
+      <div class="lg:col-span-3">
+        <div class="rv tag flex items-center gap-2 mb-5"><svg class="ic"><use href="#i-coffee"/></svg> Nghiên cứu điển hình · Highlands Coffee</div>
+        <h1 class="rv text-[clamp(2.2rem,5.4vw,4.6rem)] font-extrabold leading-[1.08]">Tạo động lực<br>&amp; <span class="grad">phong cách lãnh đạo</span></h1>
+        <p class="rv text-stone-400 text-[clamp(1rem,1.5vw,1.2rem)] mt-6 max-w-xl leading-relaxed">Từ khủng hoảng ca tối tại chi nhánh X đến bộ giải pháp quản trị nhân sự cho thế hệ Gen Z trong ngành F&amp;B.</p>
+        <div class="rv flex flex-wrap gap-3 mt-8">
+          <span class="pill" style="background:rgba(185,28,28,.25);color:#fca5a5">Maslow</span>
+          <span class="pill" style="background:rgba(234,179,8,.18);color:#fde047">Herzberg</span>
+          <span class="pill" style="background:rgba(255,255,255,.08);color:#e7e5e4">Hersey &amp; Blanchard</span>
+        </div>
+        <p class="rv text-stone-500 text-sm mt-8">Nhóm thực hiện: ……………… · Giảng viên: ………………</p>
+      </div>
+      <div class="lg:col-span-2 flex justify-center">
+        <div class="rv relative w-[min(70vw,21rem)] aspect-square flex items-center justify-center">
+          <svg viewBox="0 0 220 220" class="absolute inset-0 w-full h-full">
+            <defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b91c1c"/><stop offset="1" stop-color="#eab308"/></linearGradient></defs>
+            <circle id="ring" cx="110" cy="110" r="106" fill="none" stroke="#eab308" stroke-opacity=".5" stroke-width="1.5" stroke-dasharray="2 9" stroke-linecap="round"/>
+            <circle cx="110" cy="110" r="88" fill="rgba(185,28,28,.12)" stroke="url(#gg)" stroke-width="2"/>
+          </svg>
+          <div class="relative text-center">
+            <svg class="ic" style="width:4.2rem;height:4.2rem;color:#eab308"><use href="#i-coffee"/></svg>
+            <p class="text-2xl font-bold mt-3">Highlands<br>Coffee</p>
+            <p class="text-xs text-stone-400 mt-2 tracking-[.2em] uppercase">Case study</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SLIDE 2: CƠ SỞ LÝ THUYẾT ===== -->
+  <section class="slide">
+    <div class="inner">
+      <p class="rv tag mb-2">Phần 1 · Cơ sở lý thuyết cốt lõi</p>
+      <h2 class="rv text-[clamp(1.7rem,3.6vw,2.8rem)] font-bold mb-6">Ba lăng kính để <span class="grad">đọc hiểu con người</span> trong tổ chức</h2>
+      <div class="grid lg:grid-cols-3 gap-5">
+        <!-- Maslow -->
+        <div class="rv card">
+          <div class="flex items-center gap-3"><span style="color:#eab308"><svg class="ic lg"><use href="#i-heart"/></svg></span><h3 class="text-lg font-semibold">Tháp nhu cầu Maslow</h3></div>
+          <div class="flex flex-col items-center gap-1.5 mt-4">
+            <div class="pbar w-[42%] rounded-md py-1.5 text-center text-[11px] font-semibold" style="background:#b91c1c">Tự thể hiện</div>
+            <div class="pbar w-[58%] rounded-md py-1.5 text-center text-[11px] font-semibold" style="background:#c2410c">Được tôn trọng</div>
+            <div class="pbar w-[74%] rounded-md py-1.5 text-center text-[11px] font-semibold" style="background:#b45309">Xã hội</div>
+            <div class="pbar w-[88%] rounded-md py-1.5 text-center text-[11px] font-semibold text-stone-900" style="background:#ca8a04">An toàn</div>
+            <div class="pbar w-full rounded-md py-1.5 text-center text-[11px] font-semibold text-stone-900" style="background:#eab308">Sinh lý</div>
+          </div>
+          <p class="rv text-sm text-stone-400 mt-4 leading-relaxed">Nhu cầu chưa được thỏa mãn mới thúc đẩy hành vi. Tầng "được tôn trọng" gắn trực tiếp với cách nhà quản lý đối xử với nhân viên.</p>
+        </div>
+        <!-- Herzberg -->
+        <div class="rv card">
+          <div class="flex items-center gap-3"><span style="color:#eab308"><svg class="ic lg"><use href="#i-book"/></svg></span><h3 class="text-lg font-semibold">Thuyết hai nhân tố Herzberg</h3></div>
+          <div class="mt-4 rounded-xl p-3" style="background:rgba(185,28,28,.15);border:1px solid rgba(185,28,28,.4)">
+            <p class="text-sm font-semibold" style="color:#fca5a5">Nhân tố duy trì</p>
+            <p class="text-xs text-stone-300 mt-1 leading-relaxed">Lương, điều kiện làm việc, chính sách, quan hệ và cách giám sát. Thiếu thì bất mãn, có đủ cũng chỉ là "không bất mãn".</p>
+          </div>
+          <div class="mt-3 rounded-xl p-3" style="background:rgba(234,179,8,.12);border:1px solid rgba(234,179,8,.4)">
+            <p class="text-sm font-semibold" style="color:#fde047">Nhân tố động viên</p>
+            <p class="text-xs text-stone-300 mt-1 leading-relaxed">Thành tựu, được ghi nhận, công việc thú vị, trách nhiệm, cơ hội thăng tiến. Đây mới là nguồn của động lực thực sự.</p>
+          </div>
+        </div>
+        <!-- Hersey & Blanchard -->
+        <div class="rv card">
+          <div class="flex items-center gap-3"><span style="color:#eab308"><svg class="ic lg"><use href="#i-users"/></svg></span><h3 class="text-lg font-semibold">Lãnh đạo tình huống</h3></div>
+          <p class="text-xs text-stone-400 mt-3 leading-relaxed">Hersey &amp; Blanchard: không có phong cách tốt nhất, chỉ có phong cách phù hợp với mức độ sẵn sàng (năng lực + động lực) của nhân viên.</p>
+          <div class="grid grid-cols-2 gap-2 mt-3">
+            <div class="rounded-lg bg-white/5 border border-white/10 p-2.5"><p class="text-xs font-bold" style="color:#eab308">S1 · Chỉ đạo</p><p class="text-[11px] text-stone-400 mt-0.5">Người mới, chưa biết việc</p></div>
+            <div class="rounded-lg bg-white/5 border border-white/10 p-2.5"><p class="text-xs font-bold" style="color:#eab308">S2 · Huấn luyện</p><p class="text-[11px] text-stone-400 mt-0.5">Muốn làm nhưng còn thiếu kỹ năng</p></div>
+            <div class="rounded-lg bg-white/5 border border-white/10 p-2.5"><p class="text-xs font-bold" style="color:#eab308">S3 · Hỗ trợ</p><p class="text-[11px] text-stone-400 mt-0.5">Có kỹ năng, cần khích lệ</p></div>
+            <div class="rounded-lg bg-white/5 border border-white/10 p-2.5"><p class="text-xs font-bold" style="color:#eab308">S4 · Ủy quyền</p><p class="text-[11px] text-stone-400 mt-0.5">Vừa giỏi vừa có động lực</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SLIDE 3: THỰC TRẠNG & TÌNH HUỐNG ===== -->
+  <section class="slide">
+    <div class="inner">
+      <p class="rv tag mb-2">Phần 2 · Thực trạng &amp; tình huống</p>
+      <h2 class="rv text-[clamp(1.7rem,3.6vw,2.8rem)] font-bold mb-6">Gen Z gặp <span class="grad">quản lý độc đoán</span> ở ca tối chi nhánh X</h2>
+      <div class="grid lg:grid-cols-2 gap-5">
+        <div class="rv card">
+          <div class="flex items-center gap-3"><span style="color:#eab308"><svg class="ic lg"><use href="#i-users"/></svg></span><h3 class="text-xl font-semibold">Nhân sự Gen Z tại Highlands</h3></div>
+          <div class="mt-4 space-y-3">
+            <div class="rv li"><svg class="ic"><use href="#i-check"/></svg><span><b class="text-stone-100">Lực lượng chủ lực:</b> phần lớn nhân viên phục vụ, pha chế là người trẻ, nhiều bạn làm theo ca.</span></div>
+            <div class="rv li"><svg class="ic"><use href="#i-check"/></svg><span><b class="text-stone-100">Coi trọng sự tôn trọng:</b> muốn được góp ý riêng, tử tế và có lý do rõ ràng.</span></div>
+            <div class="rv li"><svg class="ic"><use href="#i-check"/></svg><span><b class="text-stone-100">Cần lộ trình:</b> muốn thấy cơ hội học hỏi, thăng tiến thay vì chỉ làm việc lặp lại.</span></div>
+            <div class="rv li"><svg class="ic"><use href="#i-check"/></svg><span><b class="text-stone-100">Dễ rời đi:</b> sẵn sàng nghỉ khi môi trường làm việc gây áp lực hoặc thiếu công bằng.</span></div>
+          </div>
+        </div>
+        <div class="rv card" style="border-color:rgba(185,28,28,.55)">
+          <div class="flex items-center gap-3"><span style="color:#ef4444"><svg class="ic lg"><use href="#i-alert"/></svg></span><h3 class="text-xl font-semibold">Khủng hoảng tại chi nhánh X</h3></div>
+          <p class="rv text-sm text-stone-300 mt-4 leading-relaxed">Quản lý cửa hàng điều hành theo kiểu <b class="text-stone-100">độc đoán</b>, thường xuyên <b class="text-stone-100">quát mắng nhân viên ca tối</b> khi công việc dồn dập.</p>
+          <p class="rv tag mt-5 mb-2" style="color:#fca5a5">Biểu hiện điển hình</p>
+          <div class="space-y-2.5">
+            <div class="rv li"><svg class="ic" style="color:#ef4444"><use href="#i-right"/></svg><span>Nhân viên sợ sai, ngại phản hồi, tinh thần sa sút.</span></div>
+            <div class="rv li"><svg class="ic" style="color:#ef4444"><use href="#i-right"/></svg><span>Chất lượng phục vụ giờ cao điểm giảm sút.</span></div>
+            <div class="rv li"><svg class="ic" style="color:#ef4444"><use href="#i-right"/></svg><span>Nguy cơ nghỉ việc dây chuyền, kéo theo chi phí tuyển và đào tạo lại.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SLIDE 4: PHÂN TÍCH NGUYÊN NHÂN ===== -->
+  <section class="slide">
+    <div class="inner">
+      <p class="rv tag mb-2">Phần 3 · Phân tích chuyên sâu</p>
+      <h2 class="rv text-[clamp(1.7rem,3.6vw,2.8rem)] font-bold mb-6">Sai lầm kép: <span class="grad">sai phong cách, vi phạm động lực</span></h2>
+      <div class="grid lg:grid-cols-2 gap-5">
+        <div class="rv card">
+          <div class="flex items-center gap-3"><span style="color:#ef4444"><svg class="ic lg"><use href="#i-target"/></svg></span><h3 class="text-lg font-semibold">Sai lầm về phong cách lãnh đạo</h3></div>
+          <div class="mt-4 space-y-3">
+            <div class="rv li"><svg class="ic"><use href="#i-check"/></svg><span>Dùng <b class="text-stone-100">S1 (chỉ đạo, ra lệnh)</b> cho mọi người, kể cả nhân viên đã thành thạo.</span></div>
+            <div class="rv li"><svg class="ic"><use href="#i-check"/></svg><span>Giao tiếp một chiều, không lắng nghe và không giải thích lý do.</span></div>
+            <div class="rv li"><svg class="ic"><use href="#i-check"/></svg><span>Quát mắng thay cho phản hồi cụ thể, gây tổn thương nhưng không giúp sửa lỗi.</span></div>
+            <div class="rv li"><svg class="ic"><use href="#i-check"/></svg><span>Không đánh giá mức độ sẵn sàng của từng nhân viên trước khi chọn cách dẫn dắt.</span></div>
+          </div>
+        </div>
+        <div class="rv card">
+          <div class="flex items-center gap-3"><span style="color:#eab308"><svg class="ic lg"><use href="#i-heart"/></svg></span><h3 class="text-lg font-semibold">Vi phạm thuyết tạo động lực</h3></div>
+          <div class="mt-4 space-y-3">
+            <div class="rv li"><svg class="ic"><use href="#i-check"/></svg><span><b class="text-stone-100">Maslow:</b> xâm phạm nhu cầu được tôn trọng và cảm giác an toàn tâm lý nơi làm việc.</span></div>
+            <div class="rv li"><svg class="ic"><use href="#i-check"/></svg><span><b class="text-stone-100">Herzberg:</b> cách giám sát tệ là nhân tố duy trì bị thiếu, nên sinh bất mãn.</span></div>
+            <div class="rv li"><svg class="ic"><use href="#i-check"/></svg><span><b class="text-stone-100">Herzberg:</b> thiếu ghi nhận, trách nhiệm và phát triển nên không có nhân tố động viên.</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="rv card mt-5 !py-4">
+        <p class="text-xs text-stone-500 uppercase tracking-[.2em] mb-3">Chuỗi hệ quả</p>
+        <div class="flex flex-wrap items-center gap-2 md:gap-3 text-sm" id="chain">
+          <span class="node pill !text-sm !py-1.5" style="background:rgba(255,255,255,.07)">Quát mắng</span><svg class="ic text-stone-600"><use href="#i-right"/></svg>
+          <span class="node pill !text-sm !py-1.5" style="background:rgba(255,255,255,.07)">Mất tôn trọng</span><svg class="ic text-stone-600"><use href="#i-right"/></svg>
+          <span class="node pill !text-sm !py-1.5" style="background:rgba(255,255,255,.07)">Bất mãn</span><svg class="ic text-stone-600"><use href="#i-right"/></svg>
+          <span class="node pill !text-sm !py-1.5" style="background:rgba(255,255,255,.07)">Giảm động lực</span><svg class="ic text-stone-600"><use href="#i-right"/></svg>
+          <span class="node pill !text-sm !py-1.5" style="background:rgba(255,255,255,.07)">Nghỉ việc &amp; dịch vụ giảm sút</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SLIDE 5: GIẢI PHÁP ===== -->
+  <section class="slide">
+    <div class="inner">
+      <p class="rv tag mb-2">Phần 4 · Bộ giải pháp toàn diện</p>
+      <h2 class="rv text-[clamp(1.7rem,3.6vw,2.8rem)] font-bold mb-6">Cứu lửa ngay, <span class="grad">xây nền bền vững</span> sau</h2>
+      <div class="grid lg:grid-cols-2 gap-5">
+        <div class="rv card">
+          <div class="flex items-center justify-between"><div class="flex items-center gap-3"><span style="color:#eab308"><svg class="ic lg"><use href="#i-clock"/></svg></span><h3 class="text-xl font-semibold">Giải pháp ngắn hạn</h3></div><span class="pill" style="background:rgba(185,28,28,.3);color:#fca5a5">Làm ngay</span></div>
+          <p class="rv tag mt-5 mb-2">Thưởng phạt công bằng</p>
+          <div class="space-y-2.5">
+            <div class="rv li"><svg class="ic"><use href="#i-award"/></svg><span>Ghi nhận và thưởng kịp thời cho ca tối, theo tiêu chí minh bạch.</span></div>
+            <div class="rv li"><svg class="ic"><use href="#i-award"/></svg><span>Kỷ luật có quy trình, góp ý riêng tư thay vì quát mắng.</span></div>
+          </div>
+          <p class="rv tag mt-5 mb-2">Giải tỏa áp lực</p>
+          <div class="space-y-2.5">
+            <div class="rv li"><svg class="ic"><use href="#i-msg"/></svg><span>Họp ngắn đầu ca, mở kênh phản hồi để nhân viên được lắng nghe.</span></div>
+            <div class="rv li"><svg class="ic"><use href="#i-msg"/></svg><span>Rà soát phân ca, bổ sung nhân sự giờ cao điểm; nhắc nhở và kèm cặp quản lý.</span></div>
+          </div>
+        </div>
+        <div class="rv card">
+          <div class="flex items-center justify-between"><div class="flex items-center gap-3"><span style="color:#eab308"><svg class="ic lg"><use href="#i-trend"/></svg></span><h3 class="text-xl font-semibold">Giải pháp dài hạn</h3></div><span class="pill" style="background:rgba(234,179,8,.2);color:#fde047">Bền vững</span></div>
+          <p class="rv tag mt-5 mb-2">Đào tạo lãnh đạo tình huống</p>
+          <div class="space-y-2.5">
+            <div class="rv li"><svg class="ic"><use href="#i-bulb"/></svg><span>Dạy quản lý cửa hàng chẩn đoán mức độ sẵn sàng của nhân viên rồi chọn S1 đến S4.</span></div>
+            <div class="rv li"><svg class="ic"><use href="#i-bulb"/></svg><span>Rèn kỹ năng coaching và phản hồi; đánh giá quản lý có cả ý kiến từ nhân viên.</span></div>
+          </div>
+          <p class="rv tag mt-5 mb-2">Lộ trình Career Path</p>
+          <div class="rv flex flex-wrap items-center gap-1.5 text-xs">
+            <span class="pill" style="background:rgba(255,255,255,.08)">Phục vụ / Pha chế</span><svg class="ic" style="width:.9rem;height:.9rem;color:#eab308"><use href="#i-right"/></svg>
+            <span class="pill" style="background:rgba(255,255,255,.08)">Trưởng ca</span><svg class="ic" style="width:.9rem;height:.9rem;color:#eab308"><use href="#i-right"/></svg>
+            <span class="pill" style="background:rgba(255,255,255,.08)">Phó quản lý</span><svg class="ic" style="width:.9rem;height:.9rem;color:#eab308"><use href="#i-right"/></svg>
+            <span class="pill" style="background:rgba(185,28,28,.35);color:#fecaca">Quản lý cửa hàng</span>
+          </div>
+          <p class="rv text-xs text-stone-400 mt-3 leading-relaxed">Mỗi bậc có tiêu chí và khóa đào tạo rõ ràng, giúp Gen Z thấy được tương lai ở lại.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SLIDE 6: KỊCH BẢN PHẢN BIỆN ===== -->
+  <section class="slide">
+    <div class="inner">
+      <p class="rv tag mb-2">Phần đặc biệt · Kịch bản phản biện</p>
+      <h2 class="rv text-[clamp(1.7rem,3.6vw,2.8rem)] font-bold mb-6">Hai câu hỏi hóc búa và <span class="grad">mẹo trả lời thông minh</span></h2>
+      <div class="grid lg:grid-cols-2 gap-5">
+        <div class="rv card">
+          <div class="flex items-start gap-3"><span style="color:#ef4444"><svg class="ic lg"><use href="#i-help"/></svg></span>
+            <div><p class="text-xs text-stone-500 uppercase tracking-[.2em]">Câu hỏi 1</p>
+            <h3 class="text-lg font-semibold mt-1 leading-snug">"Giờ cao điểm cần quyết đoán, sao nhóm lại phủ nhận hoàn toàn phong cách độc đoán?"</h3></div></div>
+          <div class="rv mt-4 rounded-xl p-4" style="background:rgba(234,179,8,.1);border:1px solid rgba(234,179,8,.35)">
+            <p class="flex items-center gap-2 text-sm font-semibold" style="color:#fde047"><svg class="ic" style="width:1.1rem;height:1.1rem"><use href="#i-bulb"/></svg> Mẹo trả lời</p>
+            <p class="text-sm text-stone-300 mt-2 leading-relaxed">Đồng ý một phần: phong cách chỉ đạo (S1) phù hợp với người mới hoặc tình huống khẩn cấp. Lỗi của chi nhánh X là dùng một cách cho mọi người và biến chỉ đạo thành quát mắng. Hãy phân biệt "chỉ đạo rõ ràng" với "hạ nhục".</p>
+          </div>
+        </div>
+        <div class="rv card">
+          <div class="flex items-start gap-3"><span style="color:#ef4444"><svg class="ic lg"><use href="#i-help"/></svg></span>
+            <div><p class="text-xs text-stone-500 uppercase tracking-[.2em]">Câu hỏi 2</p>
+            <h3 class="text-lg font-semibold mt-1 leading-snug">"Tăng thưởng có giữ chân được Gen Z không? Giải pháp có khả thi với cả chuỗi?"</h3></div></div>
+          <div class="rv mt-4 rounded-xl p-4" style="background:rgba(234,179,8,.1);border:1px solid rgba(234,179,8,.35)">
+            <p class="flex items-center gap-2 text-sm font-semibold" style="color:#fde047"><svg class="ic" style="width:1.1rem;height:1.1rem"><use href="#i-bulb"/></svg> Mẹo trả lời</p>
+            <p class="text-sm text-stone-300 mt-2 leading-relaxed">Theo Herzberg, tiền là nhân tố duy trì nên không tạo động lực lâu dài. Vì vậy nhóm ưu tiên giải pháp chi phí thấp (ghi nhận, phản hồi, đào tạo) trước, rồi triển khai thí điểm. Đo hiệu quả bằng tỷ lệ nghỉ việc và mức độ hài lòng của nhân viên, đối chiếu với chi phí tuyển và đào tạo lại.</p>
+          </div>
+        </div>
+      </div>
+      <div class="rv card mt-5 text-center !py-4">
+        <p class="text-lg md:text-xl flex items-center justify-center gap-3 flex-wrap"><span style="color:#eab308"><svg class="ic"><use href="#i-coffee"/></svg></span>
+          Lãnh đạo tốt là <span class="grad font-bold">chọn đúng cách dẫn dắt cho đúng người</span>. Xin cảm ơn thầy/cô và các bạn đã lắng nghe!</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Điều khiển -->
+<div id="count" class="fixed bottom-6 left-5 z-50 text-xs text-stone-500 tabular-nums"></div>
+<div id="dots" class="fixed bottom-7 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2"></div>
+<nav class="fixed bottom-4 right-4 z-50 flex items-center gap-2">
+  <button id="prev" class="btn bg-white/5 backdrop-blur-md border border-white/10 hover:border-red-700 hover:bg-white/10">← Quay lại</button>
+  <button id="next" class="btn text-white font-semibold hover:brightness-125" style="background:#b91c1c">Tiếp theo →</button>
+</nav>
+
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  const N = slides.length;
+  const o1 = document.getElementById('o1'), o2 = document.getElementById('o2');
+  const progress = document.getElementById('progress');
+  const dotsBox = document.getElementById('dots');
+  const prevBtn = document.getElementById('prev'), nextBtn = document.getElementById('next');
+  const countEl = document.getElementById('count');
+  let cur = -1, busy = false;
+
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) gsap.globalTimeline.timeScale(3);
+
+  // Kiểu chuyển cảnh khi VÀO từng slide (đổi tùy ý): 'scale' | 'flip' | 'glitch'
+  const TYPE = ['glitch', 'scale', 'flip', 'glitch', 'scale', 'flip'];
+
+  // Vị trí & màu hai khối cầu theo từng slide
+  const orbStates = [
+    { a:{x:'4vw',  y:'-12vh', c:'#b91c1c'}, b:{x:'58vw', y:'52vh', c:'#eab308'} },
+    { a:{x:'56vw', y:'-8vh',  c:'#eab308'}, b:{x:'-6vw', y:'55vh', c:'#b91c1c'} },
+    { a:{x:'40vw', y:'40vh',  c:'#991b1b'}, b:{x:'66vw', y:'-12vh', c:'#ca8a04'} },
+    { a:{x:'-8vw', y:'28vh',  c:'#dc2626'}, b:{x:'54vw', y:'48vh', c:'#a16207'} },
+    { a:{x:'50vw', y:'4vh',   c:'#eab308'}, b:{x:'2vw',  y:'50vh', c:'#b91c1c'} },
+    { a:{x:'20vw', y:'44vh',  c:'#b91c1c'}, b:{x:'62vw', y:'-6vh', c:'#eab308'} }
+  ];
+
+  // Chấm chỉ số trang
+  slides.forEach((_, i) => {
+    const d = document.createElement('span');
+    d.className = 'dot'; d.title = 'Slide ' + (i + 1);
+    d.onclick = () => go(i);
+    dotsBox.appendChild(d);
+  });
+
+  const rnd = gsap.utils.random;
+  const farX = () => (Math.random() < .5 ? -1 : 1) * rnd(innerWidth * .5, innerWidth * .9);
+  const farY = () => (Math.random() < .5 ? -1 : 1) * rnd(innerHeight * .5, innerHeight * .9);
+
+  // Hiệu ứng riêng cho từng slide
+  const extras = {
+    1: (tl, t) => tl.fromTo('.pbar', { scaleX: 0, transformOrigin: '50% 50%' }, { scaleX: 1, duration: .8, stagger: .1, ease: 'power3.out' }, t + .7),
+    3: (tl, t) => gsap.utils.toArray('#chain .node').forEach((el, k) =>
+        tl.to(el, { backgroundColor: 'rgba(185,28,28,.55)', color: '#fff', duration: .25, ease: 'power2.out' }, t + 1.2 + k * .3)),
+    0: (tl, t) => tl.fromTo('#ring', { rotation: 0, transformOrigin: '50% 50%' }, { rotation: 360, duration: 40, repeat: -1, ease: 'none' }, 0)
+  };
+
+  function go(i) {
+    if (busy || i === cur || i < 0 || i >= N) return;
+    busy = true;
+    const dir = i > cur ? 1 : -1;
+    const out = cur >= 0 ? slides[cur] : null, inn = slides[i];
+    const outInner = out ? out.querySelector('.inner') : null;
+    const innerIn = inn.querySelector('.inner');
+    const itemsIn = inn.querySelectorAll('.rv');
+    const type = TYPE[i];
+
+    const tl = gsap.timeline({ onComplete: () => {
+      if (out) { gsap.set(out, { autoAlpha: 0 }); out.classList.remove('active'); }
+      cur = i; busy = false;
+    }});
+
+    slides.forEach(s => s.style.zIndex = 1);
+    inn.style.zIndex = 2;
+    gsap.set(innerIn, { clearProps: 'all' });
+
+    // ---- Slide cũ biến mất ----
+    let t = 0.4;
+    if (out) {
+      gsap.set(outInner, { transformOrigin: '50% 50%', transformPerspective: 1400 });
+      if (type === 'scale') {
+        tl.to(outInner, { scale: .4, opacity: 0, duration: .7, ease: 'power3.in' }, 0); t = .35;
+      } else if (type === 'flip') {
+        tl.to(outInner, { rotationY: 90 * dir, opacity: 0, duration: .55, ease: 'power2.in' }, 0); t = .5;
+      } else {
+        tl.to(out.querySelectorAll('.rv'), {
+          x: () => rnd(-700, 700), y: () => rnd(-500, 500), rotation: () => rnd(-40, 40), opacity: 0,
+          duration: .6, ease: 'power3.in', stagger: { each: .012, from: 'random' }
+        }, 0); t = .5;
+      }
+    } else t = 0;
+
+    // ---- Slide mới xuất hiện ----
+    tl.set(inn, { autoAlpha: 1 }, t);
+    tl.call(() => inn.classList.add('active'), null, t);
+
+    if (type === 'scale') {
+      gsap.set(innerIn, { transformOrigin: '100% 0%' });
+      tl.fromTo(innerIn, { scale: 2, rotation: 5, opacity: 0 }, { scale: 1, rotation: 0, opacity: 1, duration: .95, ease: 'expo.out' }, t);
+      tl.fromTo(itemsIn, { x: 0, y: 50, rotation: 0, scale: 1, opacity: 0 },
+                { x: 0, y: 0, opacity: 1, duration: .8, stagger: .08, ease: 'power3.out' }, t + .25);
+    } else if (type === 'flip') {
+      gsap.set(innerIn, { transformPerspective: 1400 });
+      tl.fromTo(innerIn, { rotationY: -90 * dir, opacity: 0 }, { rotationY: 0, opacity: 1, duration: .85, ease: 'power3.out' }, t);
+      tl.fromTo(itemsIn, { x: 0, y: 50, rotation: 0, scale: 1, opacity: 0 },
+                { x: 0, y: 0, opacity: 1, duration: .8, stagger: .08, ease: 'power3.out' }, t + .3);
+    } else {
+      gsap.set(innerIn, { opacity: 1 });
+      tl.fromTo(itemsIn, { x: farX, y: farY, rotation: () => rnd(-60, 60), scale: .6, opacity: 0 },
+                { x: 0, y: 0, rotation: 0, scale: 1, opacity: 1, duration: 1, stagger: .08, ease: 'expo.out' }, t);
+    }
+    if (extras[i]) extras[i](tl, t);
+
+    // Hai khối cầu sáng
+    const s = orbStates[i];
+    tl.to(o1, { x: s.a.x, y: s.a.y, backgroundColor: s.a.c, duration: 1.8, ease: 'power2.inOut' }, 0);
+    tl.to(o2, { x: s.b.x, y: s.b.y, backgroundColor: s.b.c, duration: 1.8, ease: 'power2.inOut' }, 0);
+
+    // Tiến trình, chấm trang, nút
+    gsap.to(progress, { width: ((i + 1) / N * 100) + '%', duration: .9, ease: 'power2.out' });
+    [...dotsBox.children].forEach((d, k) => d.classList.toggle('on', k === i));
+    countEl.textContent = (i + 1) + ' / ' + N;
+    prevBtn.disabled = i === 0;
+    nextBtn.disabled = i === N - 1;
+    history.replaceState(null, '', '#' + (i + 1));
+  }
+
+  prevBtn.onclick = () => go(cur - 1);
+  nextBtn.onclick = () => go(cur + 1);
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || (e.key === ' ' && !e.shiftKey)) { e.preventDefault(); go(cur + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp' || (e.key === ' ' && e.shiftKey)) { e.preventDefault(); go(cur - 1); }
+    else if (e.key === 'Home') go(0);
+    else if (e.key === 'End') go(N - 1);
+    else if (e.key.toLowerCase() === 'f') {
+      document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+    }
+  });
+
+  // Vuốt trên màn hình cảm ứng
+  let x0 = 0;
+  document.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - x0;
+    if (Math.abs(dx) > 60) go(dx < 0 ? cur + 1 : cur - 1);
+  });
+
+  // Khởi tạo (có thể mở thẳng slide bằng index.html#3)
+  gsap.set(slides, { autoAlpha: 0 });
+  const st = Math.min(N - 1, Math.max(0, (parseInt(location.hash.slice(1), 10) || 1) - 1));
+  gsap.set(o1, { x: orbStates[st].a.x, y: orbStates[st].a.y, backgroundColor: orbStates[st].a.c });
+  gsap.set(o2, { x: orbStates[st].b.x, y: orbStates[st].b.y, backgroundColor: orbStates[st].b.c });
+  go(st);
+
+  // Chuyển động nền liên tục
+  gsap.to('.orb', { scale: 1.18, duration: 5, yoyo: true, repeat: -1, ease: 'sine.inOut', stagger: 1.6 });
+</script>
+</body>
+</html>
